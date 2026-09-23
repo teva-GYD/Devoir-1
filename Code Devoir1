@@ -1,0 +1,527 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Remoting.Contexts;
+using System.Text;
+using System.Threading.Tasks;
+using static devoir_1_3eme.Program;
+
+namespace devoir_1_3eme
+{
+    internal class Program
+    {
+        static List<string> uneListe = new List<string>();
+        static void Main(string[] args)
+        { 
+            Catalogue catalogue = new Catalogue();
+            int rep = 0;
+            do                      //Debut du Menu
+            {
+                Console.Clear();
+                Console.WriteLine("                  MENU\n");
+                Console.WriteLine("        1) Afficher tous les equipements");
+                Console.WriteLine("        2) Creer un portable");
+                Console.WriteLine("        3) Creer un projecteur");
+                Console.WriteLine("        4) Creer une camera");      // Menu affiché   
+                Console.WriteLine("        5) Louer un equipement via code");
+                Console.WriteLine("        6) Louer un equipement via sa position");
+                Console.WriteLine("        7) Fin\n");
+
+                Console.Write("Fournir votre choix (1-7) : "); // Demande du choix de l'utilisateur
+                try
+                {
+                    rep = int.Parse(Console.ReadLine());
+                
+                    switch (rep)
+                    {
+
+                        case 1:                 // Case 1 pour afficher le tableau avec tous les equipements
+                            {
+                                foreach (Equipement equipement in catalogue)            // Le foreqch parcours les equipement dans le catalogue
+                                {
+                                    Console.WriteLine("Code - "+equipement.Code + " | Nom - " + equipement.Nom + " | Quantite - " + equipement.QuantiteDispo + " disponible(s)");
+                                }
+                                Console.ReadKey();
+                                break;
+                            }
+
+
+                        case 2:                 // Case 2 pour creer un portable
+                            {
+                                Console.Write("Entrez le code : ");
+                                string code = Console.ReadLine();
+                                Console.Write("Entrez le nom : ");
+                                string nom = Console.ReadLine();
+                                Console.Write("Entrez le tarif par jour : ");
+                                float tarif = float.Parse(Console.ReadLine());
+                                Console.Write("Entrez la quantité disponible : ");
+                                int quantite = int.Parse(Console.ReadLine());
+                                Console.Write("Entrez le seuil minimum : ");
+                                int seuil = int.Parse(Console.ReadLine());
+                                Console.Write("Entrez la quantité de RAM : ");
+                                int ram = int.Parse(Console.ReadLine());
+
+                                Portable portable = new Portable(
+                                    code,
+                                    nom,
+                                    tarif,
+                                    quantite,
+                                    seuil,
+                                    ram
+                                );
+                                portable.StockBas += AfficherAlerte;
+                                portable.StockBas += MemoriserAlerte;
+                                catalogue.AjouterEquipement(portable);
+                                Console.WriteLine("Portable ajouté avec succès !");
+                                Console.ReadKey();
+                                break;
+                            }
+
+
+
+                        case 3:                 // Case 3 pour creer un projecteur
+                            {
+                                Console.Write("Entrez le code : ");
+                                string code = Console.ReadLine();
+                                Console.Write("Entrez le nom : ");
+                                string nom = Console.ReadLine();
+                                Console.Write("Entrez le tarif par jour : ");
+                                float tarif = float.Parse(Console.ReadLine());
+                                Console.Write("Entrez la quantité disponible : ");
+                                int quantite = int.Parse(Console.ReadLine());
+                                Console.Write("Entrez le seuil minimum : ");
+                                int seuil = int.Parse(Console.ReadLine());
+                                Console.Write("Entrez la quantité de puissance lumineuse : ");
+                                int puissanceLumi = int.Parse(Console.ReadLine());
+
+                                Projecteur projecteur = new Projecteur(
+                                    code,
+                                    nom,
+                                    tarif,
+                                    quantite,
+                                    seuil,
+                                    puissanceLumi
+                                );
+                                projecteur.StockBas += AfficherAlerte;
+                                projecteur.StockBas += MemoriserAlerte;
+                                catalogue.AjouterEquipement(projecteur);
+                                Console.WriteLine("Projecteur ajouté avec succès !");
+                                Console.ReadKey();
+                                break;
+                            }
+
+
+                        case 4:                 // Case 4 pour creer une camera
+                            {
+                                Console.Write("Entrez le code : ");
+                                string code = Console.ReadLine();
+                                Console.Write("Entrez le nom : ");
+                                string nom = Console.ReadLine();
+                                Console.Write("Entrez le tarif par jour : ");
+                                float tarif = float.Parse(Console.ReadLine());
+                                Console.Write("Entrez la quantité disponible : ");
+                                int quantite = int.Parse(Console.ReadLine());
+                                Console.Write("Entrez le seuil minimum : ");
+                                int seuil = int.Parse(Console.ReadLine());
+                                Console.Write("Entrez la quantité de mega pixel : ");
+                                int megaPixel = int.Parse(Console.ReadLine());
+
+                                Cameras cameras = new Cameras(
+                                    code,
+                                    nom,
+                                    tarif,
+                                    quantite,
+                                    seuil,
+                                    megaPixel
+                                );
+                                cameras.StockBas += AfficherAlerte;
+                                cameras.StockBas += MemoriserAlerte;
+                                catalogue.AjouterEquipement(cameras);
+                                Console.WriteLine("Cameras ajouté avec succès !");
+                                Console.ReadKey();
+                                break;
+                            }
+
+
+
+                        case 5:                  // Case 5 pour louer un equipement selon son code
+                            {
+                                Console.Write("Entrez le code du produit que vous souhaitez louer : ");
+                                string code = Console.ReadLine();
+                                Equipement equipement = catalogue[code];
+                                Console.Write("Combien de jours souhaitez-vous louer l'équipement ? ");
+                                int nombreJours = int.Parse(Console.ReadLine());
+                                float cout = equipement.CalculerCoutLocation(nombreJours);
+                                Console.WriteLine("Le cout de location est de : " + cout + "$");
+                                if (equipement is IDepotGarantie depot)
+                                {
+                                    Console.WriteLine("Le dépôt de garantie est de : "+ depot.CalculerDepotGarantie() + "$");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Aucun dépôt de garantie.");
+                                }
+                                equipement.RetirerUneUnite();
+                                Console.WriteLine("Équipement loué avec succès !");
+                                Console.ReadKey();
+                                break;
+                            }
+
+                        case 6:
+                            {
+                                Console.Write("Entrez la position du produit que vous souhaitez louer : ");
+                                int position = int.Parse(Console.ReadLine());
+                                Equipement equipement = catalogue[position];
+                                Console.Write("Combien de jours souhaitez-vous louer l'équipement ? ");
+                                int nombreJours = int.Parse(Console.ReadLine());
+                                float cout = equipement.CalculerCoutLocation(nombreJours);
+                                Console.WriteLine("Le cout de location est de : " + cout + "$");
+                                if (equipement is IDepotGarantie depot)
+                                {
+                                    Console.WriteLine("Le dépôt de garantie est de : " + depot.CalculerDepotGarantie() + "$");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Aucun dépôt de garantie.");
+                                }
+                                equipement.RetirerUneUnite();
+                                Console.WriteLine("Équipement loué avec succès !");
+                                Console.ReadKey();
+                                break;
+                            }
+
+                        case 7:                 // Fin du programme
+                            {
+                                Console.WriteLine("Fin du programme.");
+                                break;
+                            }
+                        default:
+                            Console.WriteLine("Choix invalide.");
+                            Console.ReadKey();
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Erreur : " + ex.Message);
+                    Console.ReadKey();
+                }
+            } while (rep != 7);
+
+            int rep2;
+            Console.WriteLine("Ecrivez 1 si vous voulez voir la memorisation des stock faible. Ou ecrivez 2 pour sortir");
+            rep2 = int.Parse(Console.ReadLine());
+            switch(rep2)
+            {
+                case 1:
+                    {
+                        foreach (string nomEquipement in uneListe)
+                        {
+                            Console.WriteLine(nomEquipement);
+                        }
+                        break;
+                    }
+                
+                case 2:
+                break;
+
+                default:
+                    Console.WriteLine("Choix invalide.");
+                    Console.ReadKey();
+                    break;
+            }
+        }
+        static void AfficherAlerte(Equipement e)
+        {
+            Console.WriteLine("ALERTE stock bas : " + e.Nom);
+        }
+
+        static void MemoriserAlerte(Equipement e)
+        {
+            uneListe.Add(e.Nom);
+        }
+
+
+        public interface IDepotGarantie
+        {
+            float CalculerDepotGarantie();
+        }
+        public abstract class Equipement
+        {
+            private string code;
+            private string nom;
+            private float tarif;
+            private int quantitedispo;
+            private int seuilmini;
+            public event Action<Equipement> StockBas;
+            public string Code
+            {
+                get { return code; }
+            }
+            public string Nom
+            {
+                get { return nom; }
+                private set
+                {
+                    if (string.IsNullOrEmpty(value))
+                        throw new ArgumentException("Le nom ne peut pas être vide.");
+                    nom = value;
+                }
+            }
+            public float Tarif
+            {
+                get { return tarif; }
+                private set 
+                { 
+                    if (value <= 0) 
+                        throw new ArgumentException("Le tarif par jour doit être supérieur à 0.");
+                    tarif = value; 
+                }
+            }
+            public int QuantiteDispo
+            {
+                get { return quantitedispo; }
+                private set
+                {
+                    if (value < 0)
+                        throw new ArgumentException("La quantité disponible ne peut pas être négative.");
+
+                    quantitedispo = value;
+                }
+            }
+            public int SeuilMini
+            {
+                get { return seuilmini; }
+                private set
+                {
+                    if (value < 0)
+                        throw new ArgumentException("Le seuil minimal ne peut être négatif.");
+                    seuilmini = value;
+                }
+            }
+
+            protected Equipement(
+                string code,
+                string nom,
+                float tarif,
+                int quantitedispo,
+                int seuilmini)
+            {
+                if (string.IsNullOrWhiteSpace(code))
+                    throw new ArgumentException("Le code ne peut pas être vide.");
+
+                this.code = code;
+                Nom = nom;
+                Tarif = tarif;
+                QuantiteDispo = quantitedispo;
+                SeuilMini = seuilmini;
+            }
+
+            public abstract float CalculerCoutLocation(int nombreJours);        //Dis que chaque classe fille doit donner sa version de calculer cout location
+
+            public void RetirerUneUnite()
+            {
+                if (quantitedispo <= 0)
+                    throw new InvalidOperationException("Il n'y a plus d'unité disponible.");
+                quantitedispo--;
+                if (quantitedispo < seuilmini)
+                {
+                    StockBas?.Invoke(this);
+                }
+
+            }
+        }
+        public class Portable : Equipement, IDepotGarantie
+        {
+            private int quantiteRam;
+            public int QuantiteRam
+            {
+                get { return quantiteRam; }
+                private set
+                {
+                    if (value <= 0)
+                        throw new ArgumentException("La quantité de Ram doit être superieur à 0.");
+                    quantiteRam = value;
+                }
+            }
+            public Portable(
+                string code,
+                string nom,
+                float tarif,
+                int quantitedispo,
+                int seuilmini,
+                int quantiteRam)
+                : base(code, nom, tarif, quantitedispo, seuilmini)
+            {
+                QuantiteRam = quantiteRam;
+            }
+            public override float CalculerCoutLocation(int nombreJours)
+            {
+                if (nombreJours <= 0)
+                    throw new ArgumentException("Le nombre de jours doit être supérieur à 0.");
+                return Tarif * nombreJours;
+            }
+            public float CalculerDepotGarantie()
+            {
+                return Tarif * 3;                                                                               //Valeur 3 mise aleatoirement
+            }
+        }
+        public class Projecteur : Equipement
+        {
+            private int puissanceLumi;
+            public int PuissanceLumi
+            {
+                get { return puissanceLumi; }
+                private set
+                {
+                    if (value <= 0)
+                        throw new ArgumentException("La puissance doit être superieur à 0.");
+                    puissanceLumi = value;
+                }
+            }
+            public Projecteur(
+                string code,
+                string nom,
+                float tarif,
+                int quantitedispo,
+                int seuilmini,
+                int puissanceLumi)
+                : base(code, nom, tarif, quantitedispo, seuilmini)
+            {
+                PuissanceLumi = puissanceLumi;
+            }
+            public override float CalculerCoutLocation(int nombreJours)
+            {
+                if (nombreJours <= 0)
+                    throw new ArgumentException("Le nombre de jours doit être supérieur à 0.");
+                return Tarif * nombreJours * 1.1f;                                                                 //Valeur 1.1 mise aleatoirement pour faire un calcul different des autres
+            }
+        }
+        public class Cameras : Equipement, IDepotGarantie
+        {
+            private int megaPixel;
+            public int MegaPixel
+            {
+                get { return megaPixel; }
+                private set
+                {
+                    if (value <= 0)
+                        throw new ArgumentException("Le nombre de mégapixels doit être superieur à 0.");
+                    megaPixel = value;
+                }
+            }
+            public Cameras(
+                string code,
+                string nom,
+                float tarif,
+                int quantitedispo,
+                int seuilmini,
+                int megaPixel)
+                : base(code, nom, tarif, quantitedispo, seuilmini)
+            {
+                MegaPixel = megaPixel;
+            }
+            public override float CalculerCoutLocation(int nombreJours)
+            {
+                if (nombreJours <= 0)
+                    throw new ArgumentException("Le nombre de jours doit être supérieur à 0.");
+                return Tarif * nombreJours * 1.2f;                                                              //Valeur 1.2 mise aleatoirement pour faire un calcul different des autres
+            }
+            public float CalculerDepotGarantie()
+            {
+                return Tarif * 3;                                                                               //Valeur 3 mise aleatoirement
+            }
+        }
+        public class Catalogue : IEnumerable<Equipement>
+        {
+            private List<Equipement> equipements;
+
+            public Catalogue()
+            {
+                equipements = new List<Equipement>();
+            }
+
+            public void AjouterEquipement(Equipement equipement)
+            {
+                foreach(Equipement e in equipements)
+                {
+                    if (equipement.Code == e.Code)
+                    {
+                        throw new ArgumentException("Le code existe déjà.");
+                    }
+                }
+                equipements.Add(equipement);
+            }
+            public Equipement this[int index]
+            {
+                get
+                {
+                    return equipements[index];
+                }
+            }
+            public Equipement this[string code]
+            {
+                get
+                {
+                    foreach (Equipement e in equipements)
+                    {
+                        if (e.Code == code)
+                        {
+                            return e;
+                        }
+                    }
+
+                    throw new KeyNotFoundException("Aucun équipement ne possède ce code.");
+                }
+            }
+            public IEnumerator<Equipement> GetEnumerator()
+            {
+                return equipements.GetEnumerator();
+            }
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+        }
+    }
+}
+
+
+
+//===============================================================
+/*                       Plan du travail                       */
+//===============================================================
+
+
+/*Classe mere commune
+            // Attribut :
+                // - Code unique
+                // - Nom
+                // - Tarif de location par jour
+                // - Quantite disponible
+                // - Seuil minimal de stock
+            // Methodes :
+                // - Calculer le cout de location
+                // - Retirer une unite*/
+
+/*Classe fille portable
+    // - Quantite de ram*/
+
+/*Classe fille projecteur
+    // - Puissance lumineuse exprime en lumens*/
+
+/*Classe fille cameras
+    // - Nombre de megapixels*/
+
+/* Classe depot de garantie
+*/
+
+/* Classe catalogue
+*/
+
+/*Faire une validation du code
+    // - Unique
+    // - Ne peut etre vide
+*/
